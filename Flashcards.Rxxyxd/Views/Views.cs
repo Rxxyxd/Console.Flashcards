@@ -1,6 +1,8 @@
 ﻿using Spectre.Console;
 using Flashcards.Rxxyxd.Controller;
 using Flashcards.Rxxyxd.Models;
+using Flashcards.Rxxyxd.Validation;
+using System.ComponentModel.Design;
 
 namespace Flashcards.Rxxyxd.Views
 {
@@ -152,7 +154,7 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void StudyHistoryView()
         {
-
+            
         }
 
         // Stack Management Methods
@@ -164,7 +166,35 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void CreateStacks()
         {
+            bool exit = false;
+            bool isValid;
+            var Controller = new Controller.Controller();
+            do
+            {
+                Console.Clear();
+                var title = new Rule("Create Stacks");
+                AnsiConsole.Write(title);
+                var stackName = AnsiConsole.Ask<string>("Enter new [green]stack name[/]: ");
+                isValid = Validate.UserInput(stackName);
+                if (isValid)
+                {
+                    stackName = stackName.Trim();
+                    Controller.CreateStack(stackName);
+                    AnsiConsole.Write("[green]Stack created.[/]");
+                    
+                    if (!AnsiConsole.Confirm("Return to Menu?"))
+                    {
+                        exit = true;
+                    }
 
+                }
+                else
+                {
+                    AnsiConsole.Write("[red] Invalid Input!");
+                    Thread.Sleep(3000);
+                }
+
+            } while (exit == false);
         }
 
         internal void UpdateStacks()
