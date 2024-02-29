@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Flashcards.Rxxyxd.Models
 {
-    public class FlashCards
+    public class Flashcards
     {
         public int ID { get; set; }
         public string? Question { get; set; }

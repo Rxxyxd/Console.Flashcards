@@ -87,7 +87,7 @@ namespace Flashcards.Rxxyxd.Views
                         ViewStacks();
                         break;
 
-                    case "Create Stack":
+                    case "Create Stacks":
                         CreateStacks();
                         break;
 
@@ -178,7 +178,9 @@ namespace Flashcards.Rxxyxd.Views
                 if (isValid)
                 {
                     stackName = stackName.Trim();
-                    Controller.CreateStack(stackName);
+                    Stacks newStack = new();
+                    newStack.Name = stackName;
+                    Controller.CreateStack(newStack);
                     AnsiConsole.Write("[green]Stack created.[/]");
                     
                     if (!AnsiConsole.Confirm("Return to Menu?"))
