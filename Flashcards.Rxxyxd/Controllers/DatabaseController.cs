@@ -25,7 +25,7 @@ namespace Flashcards.Rxxyxd.Controllers
                         cmd.ExecuteNonQuery();
                     }
 
-                    // Flashcard table
+                    // Flashcard table - Needs to be adjusted
                     query = "IF OBJECT_ID(N'Flashcards', N'U') IS NULL CREATE TABLE Flashcards ( ID INT NOT NULL FOREIGN KEY REFERENCES Stacks(ID), Question text, Answer text );";
                     using (var cmd = conn.CreateCommand())
                     {
