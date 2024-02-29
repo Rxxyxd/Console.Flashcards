@@ -2,7 +2,6 @@
 using Flashcards.Rxxyxd.Controllers;
 using Flashcards.Rxxyxd.Models;
 using Flashcards.Rxxyxd.Validation;
-using System.Data.SqlClient;
 
 namespace Flashcards.Rxxyxd.Views
 {
