@@ -2,6 +2,7 @@
 using Flashcards.Rxxyxd.Controllers;
 using Flashcards.Rxxyxd.Models;
 using Flashcards.Rxxyxd.Validation;
+using System.Data.SqlClient;
 
 namespace Flashcards.Rxxyxd.Views
 {
@@ -61,94 +62,103 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void ManageStackView()
         {
-            bool exit = false;
-            do
+            try
             {
-                
-                AnsiConsole.Clear();
+                bool exit = false;
+                do
+                {
 
-                var title = new Rule("[green] Manage Stacks [/]");
-                AnsiConsole.Write(title);
+                    AnsiConsole.Clear();
 
-                var option = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>()
-                        .Title("Manage Stacks Menu")
-                        .PageSize(10)
-                        .AddChoices(new[]
-                        {
+                    var title = new Rule("[green] Manage Stacks [/]");
+                    AnsiConsole.Write(title);
+
+                    var option = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Manage Stacks Menu")
+                            .PageSize(10)
+                            .AddChoices(new[]
+                            {
                         "View Stacks", "Create Stacks",
                         "Update Stacks", "Delete Stacks",
                         "Back to Main Menu",
-                        }));
+                            }));
 
-                switch (option)
-                {
-                    case "View Stacks":
-                        ViewStacks();
-                        break;
+                    switch (option)
+                    {
+                        case "View Stacks":
+                            ViewStacks();
+                            break;
 
-                    case "Create Stacks":
-                        CreateStacks();
-                        break;
+                        case "Create Stacks":
+                            CreateStacks();
+                            break;
 
-                    case "Update Stacks":
-                        UpdateStacks();
-                        break;
+                        case "Update Stacks":
+                            UpdateStacks();
+                            break;
 
-                    case "Delete Stacks":
-                        DeleteStacks();
-                        break;
+                        case "Delete Stacks":
+                            DeleteStacks();
+                            break;
 
-                    case "Back to Main Menu":
-                        exit = true;
-                        break;
-                }
-            } while (exit == false);
+                        case "Back to Main Menu":
+                            exit = true;
+                            break;
+                    }
+                } while (exit == false);
+            }
+            catch (Exception) { throw; }
+            
         }
 
         internal void ManageFlashcardView()
         {
-            bool exit = false;
-            do
+            try
             {
-                AnsiConsole.Clear();
+                bool exit = false;
+                do
+                {
+                    AnsiConsole.Clear();
 
-                var title = new Rule("[green] Manage Flashcards [/]");
-                AnsiConsole.Write(title);
-                var option = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>()
-                        .Title("Manage Stacks Menu")
-                        .PageSize(10)
-                        .AddChoices(new[]
-                        {
+                    var title = new Rule("[green] Manage Flashcards [/]");
+                    AnsiConsole.Write(title);
+                    var option = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Manage Stacks Menu")
+                            .PageSize(10)
+                            .AddChoices(new[]
+                            {
                         "View Flashcards", "Create Flashcards",
                         "Update Flashcards", "Delete Flashcards",
                         "Back to Main Menu",
-                        }));
+                            }));
 
-                switch (option)
-                {
-                    case "View Flashcards":
-                        ViewFlashcards();
-                        break;
+                    switch (option)
+                    {
+                        case "View Flashcards":
+                            ViewFlashcards();
+                            break;
 
-                    case "Create Flashcards":
-                        CreateFlashcards();
-                        break;
+                        case "Create Flashcards":
+                            CreateFlashcards();
+                            break;
 
-                    case "Update Flashcards":
-                        UpdateFlashcards();
-                        break;
+                        case "Update Flashcards":
+                            UpdateFlashcards();
+                            break;
 
-                    case "Delete Flashcards":
-                        DeleteFlashcards();
-                        break;
+                        case "Delete Flashcards":
+                            DeleteFlashcards();
+                            break;
 
-                    case "Back to Main Menu":
-                        exit = true;
-                        break;
-                }
-            } while (exit == false);        
+                        case "Back to Main Menu":
+                            exit = true;
+                            break;
+                    }
+                } while (exit == false);
+            }
+            catch (Exception) { throw; }
         }
 
         internal void StudyHistoryView()
@@ -160,7 +170,23 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void ViewStacks()
         {
+            var Controller = new DatabaseController();
+            var table = new Table();
+            table.AddColumn("ID");
+            table.AddColumn("Name");
 
+            try
+            {
+                var Stacks = Controller.GetStacks();
+                foreach (var stack in Stacks)
+                {
+                    table.AddRow(stack.ID.ToString(), stack.Name.ToString());
+                }
+            }
+            catch (Exception) { throw; }
+
+            AnsiConsole.Write(table);
+            Console.ReadKey();
         }
 
         internal void CreateStacks()
@@ -180,10 +206,15 @@ namespace Flashcards.Rxxyxd.Views
                     stackName = stackName.Trim();
                     Stacks newStack = new();
                     newStack.Name = stackName;
-                    Controller.CreateStack(newStack);
+                    try
+                    {
+                        Controller.CreateStack(newStack);
+                    }
+                    catch (Exception) { throw; }
+
                     AnsiConsole.Write("[green]Stack created.[/]");
                     
-                    if (!AnsiConsole.Confirm("Return to Menu?"))
+                    if (AnsiConsole.Confirm("Return to Menu?"))
                     {
                         exit = true;
                     }

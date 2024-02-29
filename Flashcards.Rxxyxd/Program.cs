@@ -9,9 +9,16 @@ namespace Flashcards.Rxxyxd
         {
             var Controller = new DatabaseController();
             var Views = new View();
-
-            Controller.InitializeDatabase();
-            Views.MainMenuView();
+            try
+            {
+                Controller.InitializeDatabase();
+                Views.MainMenuView();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.StackTrace);
+                Console.WriteLine(ex.Message);
+            }
         }
     }
 }
