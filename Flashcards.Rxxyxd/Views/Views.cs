@@ -1,12 +1,11 @@
 ﻿using Spectre.Console;
-using Flashcards.Rxxyxd.Controller;
+using Flashcards.Rxxyxd.Controllers;
 using Flashcards.Rxxyxd.Models;
 using Flashcards.Rxxyxd.Validation;
-using System.ComponentModel.Design;
 
 namespace Flashcards.Rxxyxd.Views
 {
-    internal class Views
+    internal class View
     {
         public void MainMenuView()
         {
@@ -168,7 +167,7 @@ namespace Flashcards.Rxxyxd.Views
         {
             bool exit = false;
             bool isValid;
-            var Controller = new Controller.Controller();
+            var Controller = new DatabaseController();
             do
             {
                 Console.Clear();

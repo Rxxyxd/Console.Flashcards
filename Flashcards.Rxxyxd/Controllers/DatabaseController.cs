@@ -1,10 +1,12 @@
 ﻿using System.Data.SqlClient;
+using System.Configuration;
+using System.Collections.Specialized;
 
-namespace Flashcards.Rxxyxd.Controller
+namespace Flashcards.Rxxyxd.Controllers
 {
-    public class Controller
+    public class DatabaseController
     {
-        public string connectionString = null; // need to create app config
+        public string? connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
         public void InitializeDatabase()
         {
             string query;
@@ -14,7 +16,7 @@ namespace Flashcards.Rxxyxd.Controller
                 conn.Open();
 
                 // Stacks table
-                query = "CREATE TABLE IF NOT EXISTS Stacks ( ID INT NOT NULL, Name TEXT, PRIMARYKEY (ID) );";
+                query = "IF OBJECT_ID(N'Stacks', N'U') IS NULL CREATE TABLE Stacks ( ID int NOT NULL PRIMARY KEY, Name varchar(20) UNIQUE );";
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = query;
@@ -22,7 +24,7 @@ namespace Flashcards.Rxxyxd.Controller
                 }
 
                 // Flashcard table
-                query = "CREATE TABLE IF NOT EXISTS Flashcards ( ID INT NOT NULL, Question TEXT, Answer TEXT, FOREIGN KEY (ID) REFERENCES Stacks(ID) );";
+                query = "IF OBJECT_ID(N'Flashcards', N'U') IS NULL CREATE TABLE Flashcards ( ID INT NOT NULL FOREIGN KEY REFERENCES Stacks(ID), Question text, Answer text );";
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = query;
