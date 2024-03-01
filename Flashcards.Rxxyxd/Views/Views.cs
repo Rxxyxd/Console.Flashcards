@@ -1,6 +1,5 @@
 ﻿using Spectre.Console;
 using Flashcards.Rxxyxd.Models;
-using Flashcards.Rxxyxd.Validation;
 
 namespace Flashcards.Rxxyxd.Views
 {
@@ -106,7 +105,7 @@ namespace Flashcards.Rxxyxd.Views
                     }
                 } while (exit == false);
             }
-            catch (Exception) { throw; }
+            catch { throw; }
             
         }
 
@@ -181,7 +180,7 @@ namespace Flashcards.Rxxyxd.Views
                     table.AddRow(stack.ID.ToString(), stack.Name.ToString());
                 }
             }
-            catch (Exception) { throw; }
+            catch { throw; }
 
             AnsiConsole.Write(table);
             Console.ReadKey();
@@ -191,32 +190,38 @@ namespace Flashcards.Rxxyxd.Views
         {
             bool exit = false;
             bool isValid;
+            string stackName;
             var db = new Database.Database();
             do
             {
                 AnsiConsole.Clear();
                 var title = new Rule("[green]Create Stacks[/]");
                 AnsiConsole.Write(title);
-                var stackName = AnsiConsole.Ask<string>("Enter new [green]stack name[/]: ");
-                isValid = Validate.UserInput(stackName);
-                if (isValid)
+                var userInput = AnsiConsole.Prompt(new TextPrompt<string>($"Enter new Stack Name: ")
+                .PromptStyle("grey")
+                .ValidationErrorMessage("Name must be less than 20 characters.")
+                .Validate(input =>
                 {
-                    stackName = stackName.Trim();
-                    Stacks newStack = new();
-                    newStack.Name = stackName;
-                    try
+                    if (input.Length > 20)
                     {
-                        db.CreateStack(newStack);
+                        return false;
                     }
-                    catch (Exception) { throw; }
+                    return true;
+                }));
+                stackName = userInput.Trim();
+                Stacks newStack = new();
+                newStack.Name = stackName;
+                try
+                {
+                    db.CreateStack(newStack);
+                }
+                catch { throw; }
 
-                    AnsiConsole.Write("[green]Stack created.[/]");
-                    
-                    if (AnsiConsole.Confirm("Return to Menu?"))
-                    {
-                        exit = true;
-                    }
+                AnsiConsole.Write("[green]Stack created.[/]");
 
+                if (AnsiConsole.Confirm("Return to Menu?"))
+                {
+                    exit = true;
                 }
                 else
                 {
@@ -267,8 +272,11 @@ namespace Flashcards.Rxxyxd.Views
 
             updatedStack.Name = userInput;
             updatedStack.ID = stackID;
-
-            db.UpdateStack(updatedStack);
+            try
+            {
+                db.UpdateStack(updatedStack);
+            }
+            catch { throw; }
 
         }
 
@@ -299,8 +307,11 @@ namespace Flashcards.Rxxyxd.Views
             stackID = int.Parse(userInput);
             deleteStack.ID = stackID;
 
-            db.DeleteStack(deleteStack);
-
+            try
+            {
+                db.DeleteStack(deleteStack);
+            }
+            catch { throw; }
 
         }
 
