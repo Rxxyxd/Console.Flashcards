@@ -1,4 +1,4 @@
-﻿using Flashcards.Rxxyxd.Controllers;
+﻿using Flashcards.Rxxyxd.Database;
 using Flashcards.Rxxyxd.Views;
 
 namespace Flashcards.Rxxyxd
@@ -7,11 +7,11 @@ namespace Flashcards.Rxxyxd
     {
         static void Main(string[] args)
         {
-            var Controller = new DatabaseOperations();
+            var DatabaseOperations = new Database.Database();
             var Views = new View();
             try
             {
-                Controller.InitializeDatabase();
+                DatabaseOperations.Initialize();
                 Views.MainMenuView();
             }
             catch (Exception ex)

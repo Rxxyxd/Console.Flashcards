@@ -2,12 +2,16 @@
 using System.Configuration;
 using Flashcards.Rxxyxd.Models;
 
-namespace Flashcards.Rxxyxd.Controllers
+namespace Flashcards.Rxxyxd.Database
 {
-    public class DatabaseOperations
+    internal class Database
     {
-        public string? connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
-        public void InitializeDatabase()
+        public string? connectionString;
+        public Database()
+        {
+            connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
+        }
+        protected internal void Initialize()
         {
             string query;
 
@@ -43,7 +47,7 @@ namespace Flashcards.Rxxyxd.Controllers
 
 
         // CRUD for Stack table
-        public void CreateStack(Stacks newStack)
+        protected internal void CreateStack(Stacks newStack)
         {
             using (var conn = new SqlConnection(connectionString))
             {
@@ -76,7 +80,7 @@ namespace Flashcards.Rxxyxd.Controllers
             }
         }
 
-        public List<Stacks> GetStacks()
+        protected internal List<Stacks> GetStacks()
         {
             List<Stacks> stacks = new List<Stacks>();
 

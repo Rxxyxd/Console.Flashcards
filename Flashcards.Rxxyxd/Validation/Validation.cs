@@ -1,6 +1,6 @@
 ﻿namespace Flashcards.Rxxyxd.Validation
 {
-    public class Validate
+    internal class Validate
     {
         public static bool UserInput(string userInput)
         {

@@ -1,5 +1,4 @@
 ﻿using Spectre.Console;
-using Flashcards.Rxxyxd.Controllers;
 using Flashcards.Rxxyxd.Models;
 using Flashcards.Rxxyxd.Validation;
 
@@ -7,7 +6,7 @@ namespace Flashcards.Rxxyxd.Views
 {
     internal class View
     {
-        public void MainMenuView()
+         internal void MainMenuView()
         {
             bool exit = false;
             do
@@ -169,7 +168,7 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void ViewStacks()
         {
-            var Controller = new DatabaseOperations();
+            var Controller = new Database.Database();
             var table = new Table();
             table.AddColumn("ID");
             table.AddColumn("Name");
@@ -192,7 +191,7 @@ namespace Flashcards.Rxxyxd.Views
         {
             bool exit = false;
             bool isValid;
-            var Controller = new DatabaseOperations();
+            var Controller = new Database.Database();
             do
             {
                 Console.Clear();
