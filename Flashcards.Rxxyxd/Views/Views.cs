@@ -168,14 +168,14 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void ViewStacks()
         {
-            var Controller = new Database.Database();
+            var Database = new Database.Database();
             var table = new Table();
             table.AddColumn("ID");
             table.AddColumn("Name");
 
             try
             {
-                var Stacks = Controller.GetStacks();
+                var Stacks = Database.GetStacks();
                 foreach (var stack in Stacks)
                 {
                     table.AddRow(stack.ID.ToString(), stack.Name.ToString());
@@ -191,11 +191,11 @@ namespace Flashcards.Rxxyxd.Views
         {
             bool exit = false;
             bool isValid;
-            var Controller = new Database.Database();
+            var db = new Database.Database();
             do
             {
-                Console.Clear();
-                var title = new Rule("Create Stacks");
+                AnsiConsole.Clear();
+                var title = new Rule("[green]Create Stacks[/]");
                 AnsiConsole.Write(title);
                 var stackName = AnsiConsole.Ask<string>("Enter new [green]stack name[/]: ");
                 isValid = Validate.UserInput(stackName);
@@ -206,7 +206,7 @@ namespace Flashcards.Rxxyxd.Views
                     newStack.Name = stackName;
                     try
                     {
-                        Controller.CreateStack(newStack);
+                        db.CreateStack(newStack);
                     }
                     catch (Exception) { throw; }
 
@@ -229,6 +229,46 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void UpdateStacks()
         {
+            int stackID;
+
+            AnsiConsole.Clear();
+            var title = new Rule("[green]Update Stacks[/]");
+            AnsiConsole.Write(title);
+
+            var db = new Database.Database();
+            var stackModel = new Stacks();
+            int totalStackCount = db.GetStackCount();
+            
+            var userInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter Stack ID: ")
+                .PromptStyle("grey")
+                .ValidationErrorMessage("Please enter an existing stack ID")
+                .Validate(input =>
+                {
+                    if (!int.TryParse(input, out int result))
+                    {
+                        return false;
+                    }
+                    return result < totalStackCount;
+                }));
+
+            stackID = int.Parse(userInput);
+
+            userInput = AnsiConsole.Prompt(new TextPrompt<string>($"Enter new name Stack ID {stackID}")
+                .PromptStyle("grey")
+                .ValidationErrorMessage("Name must be less than 20 characters.")
+                .Validate(input =>
+                {
+                    if (input.Length > 20)
+                    {
+                        return false;
+                    }
+                    return true;
+                }));
+
+            stackModel.Name = userInput;
+            stackModel.ID = stackID;
+
+
 
         }
 

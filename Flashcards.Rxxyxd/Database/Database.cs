@@ -80,6 +80,34 @@ namespace Flashcards.Rxxyxd.Database
             }
         }
 
+        protected internal int GetStackCount()
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    try
+                    {
+                        conn.Open();
+                        string query = "SELECT COUNT(*) FROM Stacks;";
+                        cmd.CommandText = query;
+                        return (int)cmd.ExecuteScalar();
+                    }
+                    catch (SqlException) { throw; }
+                    catch (Exception) { throw; }
+
+                    finally
+                    {
+
+                        if (conn.State != System.Data.ConnectionState.Closed)
+                        {
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+        }
+
         protected internal List<Stacks> GetStacks()
         {
             List<Stacks> stacks = new List<Stacks>();
@@ -113,6 +141,7 @@ namespace Flashcards.Rxxyxd.Database
                             reader.Close();
                             cmd.Dispose();
                             conn.Close();
+                            conn.Dispose();
                         }
                     }
                     catch (SqlException) { throw; }
@@ -120,7 +149,7 @@ namespace Flashcards.Rxxyxd.Database
                     
                     finally
                     {
-                        // Ensure connection closes
+
                         if (conn.State != System.Data.ConnectionState.Closed)
                         {
                             conn.Close();
@@ -130,6 +159,38 @@ namespace Flashcards.Rxxyxd.Database
             }
 
             return stacks;
+        }
+
+        protected internal void UpdateStack(Stacks updatedStack)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                using (var cmd = new SqlCommand())
+                {
+                    try
+                    {
+                        string query = "UPDATE Stacks SET Name = @Name WHERE ID = @ID;";
+                        cmd.CommandText = query;
+                        cmd.Parameters.AddWithValue("@Name", updatedStack.Name);
+                        cmd.Parameters.AddWithValue("@ID", updatedStack.ID);
+                        cmd.ExecuteNonQuery();
+                        cmd.Dispose();
+                        conn.Close();
+                        conn.Dispose();
+                    }
+                    catch (SqlException) { throw; }
+                    catch (Exception) { throw; }
+
+                    finally
+                    {
+
+                        if (conn.State != System.Data.ConnectionState.Closed)
+                        {
+                            conn.Close();
+                        }
+                    }
+                }
+            }
         }
 
         // CRUD Flashcards
