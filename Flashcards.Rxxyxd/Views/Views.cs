@@ -337,6 +337,7 @@ namespace Flashcards.Rxxyxd.Views
                         table.AddRow(flashcard.ID.ToString(), flashcard.Question, flashcard.Answer);
                 }
             }
+            catch { throw; }
         }
 
         internal void CreateFlashcards()
