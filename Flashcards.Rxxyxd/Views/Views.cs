@@ -168,6 +168,7 @@ namespace Flashcards.Rxxyxd.Views
         internal void ViewStacks()
         {
             var Database = new Database.Database();
+            var title = new Rule("View Stacks");
             var table = new Table();
             table.AddColumn("ID");
             table.AddColumn("Name");
@@ -181,7 +182,7 @@ namespace Flashcards.Rxxyxd.Views
                 }
             }
             catch { throw; }
-
+            AnsiConsole.Write(title);
             AnsiConsole.Write(table);
             Console.ReadKey();
         }
@@ -319,7 +320,23 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void ViewFlashcards()
         {
+            try
+            {
+                var db = new Database.Database();
+                List<Models.Flashcards> flashcards = db.GetFlashcards();
 
+                var title = new Rule("View Flashcards");
+                var table = new Table();
+                table.AddColumn("ID");
+                table.AddColumn("Question");
+                table.AddColumn("Answer");
+
+                foreach (Models.Flashcards flashcard in flashcards)
+                {
+                    if (flashcard.Question != null && flashcard.Answer != null)
+                        table.AddRow(flashcard.ID.ToString(), flashcard.Question, flashcard.Answer);
+                }
+            }
         }
 
         internal void CreateFlashcards()

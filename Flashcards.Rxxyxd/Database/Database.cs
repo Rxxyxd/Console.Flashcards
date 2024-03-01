@@ -227,5 +227,51 @@ namespace Flashcards.Rxxyxd.Database
 
         // CRUD Flashcards
         
+        internal List<Models.Flashcards> GetFlashcards()
+        {
+            List<Models.Flashcards> flashcards = new List<Models.Flashcards>();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    try
+                    {
+                        var query = "SELECT * FROM Flashcards;";
+                        conn.Open();
+                        cmd.Connection = conn;
+                        cmd.CommandText = query;
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                var flashcard = new Models.Flashcards();
+
+                                if (reader["ID"] != DBNull.Value)
+                                {
+                                    flashcard.ID = Convert.ToInt16(reader["ID"]);
+                                }
+
+                                flashcard.Question = reader["Question"].ToString();
+                                flashcard.Answer = reader["Answer"].ToString();
+
+                                flashcards.Add(flashcard);
+                            }
+                            reader.Close();
+                        }
+                        cmd.Dispose();
+                        conn.Close();
+                    }
+                    catch { throw; }
+                    finally
+                    {
+                        if (conn.State != System.Data.ConnectionState.Closed)
+                        { 
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+            return flashcards;
+        }
     }
 }
