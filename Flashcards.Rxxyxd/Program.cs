@@ -19,6 +19,10 @@ namespace Flashcards.Rxxyxd
                 Console.WriteLine(ex.StackTrace);
                 Console.WriteLine(ex.Message);
             }
+            finally
+            {
+                Views.MainMenuView();
+            }
         }
     }
 }

@@ -30,7 +30,7 @@ namespace Flashcards.Rxxyxd.Database
                     }
 
                     // Flashcard table - Needs to be adjusted
-                    query = "IF OBJECT_ID(N'Flashcards', N'U') IS NULL CREATE TABLE Flashcards ( ID INT NOT NULL FOREIGN KEY REFERENCES Stacks(ID), Question text, Answer text );";
+                    query = "IF OBJECT_ID(N'Flashcards', N'U') IS NULL CREATE TABLE Flashcards ( ID INT NOT NULL FOREIGN KEY REFERENCES Stacks(ID) ON DELETE CASCADE, Question text, Answer text );";
                     using (var cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = query;
@@ -185,6 +185,37 @@ namespace Flashcards.Rxxyxd.Database
                     finally
                     {
 
+                        if (conn.State != System.Data.ConnectionState.Closed)
+                        {
+                            conn.Close();
+                        }
+                    }
+                }
+            }
+        }
+
+        protected internal void DeleteStack(Stacks deleteStack)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    try
+                    {
+                        conn.Open();
+                        string query = "DELETE FROM Stacks WHERE ID = @ID;";
+                        cmd.CommandText = query;
+                        cmd.Parameters.AddWithValue("@ID", deleteStack.ID);
+                        cmd.ExecuteNonQuery();
+                        cmd.Dispose();
+                        conn.Close();
+                        conn.Dispose();
+                    }
+                    catch (SqlException) { throw; }
+                    catch (Exception) { throw; }
+
+                    finally
+                    {
                         if (conn.State != System.Data.ConnectionState.Closed)
                         {
                             conn.Close();

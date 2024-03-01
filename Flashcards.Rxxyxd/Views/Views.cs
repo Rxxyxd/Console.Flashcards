@@ -274,6 +274,33 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void DeleteStacks()
         {
+            int stackID;
+
+            AnsiConsole.Clear();
+            var title = new Rule("[green]Delete Stacks[/]");
+            AnsiConsole.Write(title);
+
+            var db = new Database.Database();
+            var deleteStack = new Stacks();
+            int totalStackCount = db.GetStackCount();
+
+            var userInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter Stack ID: ")
+                .PromptStyle("grey")
+                .ValidationErrorMessage("Please enter an existing stack ID")
+                .Validate(input =>
+                {
+                    if (!int.TryParse(input, out int result))
+                    {
+                        return false;
+                    }
+                    return result <= totalStackCount;
+                }));
+
+            stackID = int.Parse(userInput);
+            deleteStack.ID = stackID;
+
+            db.DeleteStack(deleteStack);
+
 
         }
 
