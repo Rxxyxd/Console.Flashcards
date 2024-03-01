@@ -236,7 +236,7 @@ namespace Flashcards.Rxxyxd.Views
             AnsiConsole.Write(title);
 
             var db = new Database.Database();
-            var stackModel = new Stacks();
+            var updatedStack = new Stacks();
             int totalStackCount = db.GetStackCount();
             
             var userInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter Stack ID: ")
@@ -248,7 +248,7 @@ namespace Flashcards.Rxxyxd.Views
                     {
                         return false;
                     }
-                    return result < totalStackCount;
+                    return result <= totalStackCount;
                 }));
 
             stackID = int.Parse(userInput);
@@ -265,10 +265,10 @@ namespace Flashcards.Rxxyxd.Views
                     return true;
                 }));
 
-            stackModel.Name = userInput;
-            stackModel.ID = stackID;
+            updatedStack.Name = userInput;
+            updatedStack.ID = stackID;
 
-
+            db.UpdateStack(updatedStack);
 
         }
 

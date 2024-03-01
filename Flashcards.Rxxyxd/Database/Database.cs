@@ -114,7 +114,7 @@ namespace Flashcards.Rxxyxd.Database
 
             using (var conn = new SqlConnection(connectionString))
             {
-                using (var cmd = new SqlCommand())
+                using (var cmd = conn.CreateCommand())
                 {
                     try
                     {
@@ -165,10 +165,11 @@ namespace Flashcards.Rxxyxd.Database
         {
             using (var conn = new SqlConnection(connectionString))
             {
-                using (var cmd = new SqlCommand())
+                using (var cmd = conn.CreateCommand())
                 {
                     try
                     {
+                        conn.Open();
                         string query = "UPDATE Stacks SET Name = @Name WHERE ID = @ID;";
                         cmd.CommandText = query;
                         cmd.Parameters.AddWithValue("@Name", updatedStack.Name);
