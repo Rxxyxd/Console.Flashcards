@@ -336,13 +336,39 @@ namespace Flashcards.Rxxyxd.Views
                     if (flashcard.Question != null && flashcard.Answer != null)
                         table.AddRow(flashcard.ID.ToString(), flashcard.Question, flashcard.Answer);
                 }
+                AnsiConsole.Write(table);
+
+                string[] Stacks = db.GetStackArray();
+
+
             }
             catch { throw; }
         }
 
         internal void CreateFlashcards()
         {
+            try
+            {
+                var db = new Database.Database();
+                string[] Stacks = db.GetStackArray();
+                var flashcard = new Models.Flashcards();
+                var title = new Rule("[green] Manage Flashcards [/]");
+                AnsiConsole.Write(title);
 
+
+                var option = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Manage Stacks Menu")
+                        .PageSize(10)
+                        .AddChoices(Stacks));
+
+                flashcard.ID = db.GetStackIdByName(option);
+
+                // get question
+                // get answer
+                // db.CreateFlashcard(flashcard)
+            }
+            catch { throw; }
         }
 
         internal void UpdateFlashcards()

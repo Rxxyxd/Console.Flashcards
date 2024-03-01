@@ -65,7 +65,17 @@ namespace Flashcards.Rxxyxd.Database
                         cmd.Dispose();
                         conn.Close();
                     }
-                    catch(SqlException) { throw; }
+                    catch(SqlException ex)
+                    {
+                        if (ex.Number == 2627)
+                        {
+                            throw new ArgumentException("Stacks.Name already exists.");
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
                     catch(Exception) { throw; }
 
                     finally
@@ -225,9 +235,52 @@ namespace Flashcards.Rxxyxd.Database
             }
         }
 
+        protected internal string[] GetStackArray()
+        {
+            List<string> Stacks = new List<string>();
+            using (var conn = new SqlConnection(connectionString))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    
+                    conn.Open();
+                    var query = "SELECT * FROM Stacks;";
+                    cmd.CommandText = query;
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            if (reader["name"] != DBNull.Value)
+                            {
+                                Stacks.Add(reader["name"].ToString());
+                            }
+                        }
+                    }
+                }
+            }
+            return Stacks.ToArray();
+        }
+
+        protected internal int GetStackIdByName(string name)
+        {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    var query = "SELECT ID FROM Stacks WHERE Name = @Name";
+                    conn.Open();
+                    cmd.CommandText = query;
+                    cmd.Parameters.AddWithValue(query, name);
+                    return Convert.ToInt16(cmd.ExecuteScalar());
+                    
+                }
+            }
+        }
+
         // CRUD Flashcards
         
-        internal List<Models.Flashcards> GetFlashcards()
+        protected internal List<Models.Flashcards> GetFlashcards()
         {
             List<Models.Flashcards> flashcards = new List<Models.Flashcards>();
             using (var conn = new SqlConnection(connectionString))
@@ -272,6 +325,11 @@ namespace Flashcards.Rxxyxd.Database
                 }
             }
             return flashcards;
+        }
+
+        protected internal void CreateFlashcard(Models.Flashcards flashcards)
+        {
+
         }
     }
 }
