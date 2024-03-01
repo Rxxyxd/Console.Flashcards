@@ -189,26 +189,27 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void CreateStacks()
         {
-            bool exit = false;
-            bool isValid;
+
             string stackName;
             var db = new Database.Database();
-            do
+
+            AnsiConsole.Clear();
+            var title = new Rule("[green]Create Stacks[/]");
+            AnsiConsole.Write(title);
+            var userInput = AnsiConsole.Prompt(new TextPrompt<string>($"Enter new Stack Name (or 'q' to return to menu): ")
+            .PromptStyle("grey")
+            .ValidationErrorMessage("Name must be less than 20 characters.")
+            .Validate(input =>
             {
-                AnsiConsole.Clear();
-                var title = new Rule("[green]Create Stacks[/]");
-                AnsiConsole.Write(title);
-                var userInput = AnsiConsole.Prompt(new TextPrompt<string>($"Enter new Stack Name: ")
-                .PromptStyle("grey")
-                .ValidationErrorMessage("Name must be less than 20 characters.")
-                .Validate(input =>
+                if (input.Length > 20)
                 {
-                    if (input.Length > 20)
-                    {
-                        return false;
-                    }
-                    return true;
-                }));
+                    return false;
+                }
+                return true;
+            }));
+
+            if (userInput.ToLower() != "q")
+            {
                 stackName = userInput.Trim();
                 Stacks newStack = new();
                 newStack.Name = stackName;
@@ -219,18 +220,7 @@ namespace Flashcards.Rxxyxd.Views
                 catch { throw; }
 
                 AnsiConsole.Write("[green]Stack created.[/]");
-
-                if (AnsiConsole.Confirm("Return to Menu?"))
-                {
-                    exit = true;
-                }
-                else
-                {
-                    AnsiConsole.Write("[red] Invalid Input!");
-                    Thread.Sleep(3000);
-                }
-
-            } while (exit == false);
+            }
         }
 
         internal void UpdateStacks()
@@ -243,41 +233,51 @@ namespace Flashcards.Rxxyxd.Views
 
             var db = new Database.Database();
             var updatedStack = new Stacks();
-            int totalStackCount = db.GetStackCount();
+            int[] StackIds = db.GetStackIds();
             
-            var userInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter Stack ID: ")
+            var userInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter Stack ID (or 'q' to return to menu): ")
                 .PromptStyle("grey")
                 .ValidationErrorMessage("Please enter an existing stack ID")
                 .Validate(input =>
                 {
-                    if (!int.TryParse(input, out int result))
+                    foreach (int id in StackIds)
                     {
-                        return false;
+                        if (int.TryParse(input, out int result) && result == id)
+                        {
+                            return true;
+                        }
                     }
-                    return result <= totalStackCount;
-                }));
-
-            stackID = int.Parse(userInput);
-
-            userInput = AnsiConsole.Prompt(new TextPrompt<string>($"Enter new name Stack ID {stackID}")
-                .PromptStyle("grey")
-                .ValidationErrorMessage("Name must be less than 20 characters.")
-                .Validate(input =>
-                {
-                    if (input.Length > 20)
+                    if (input.ToLower() == "q")
                     {
-                        return false;
+                        return true;
                     }
-                    return true;
+                    return false;
                 }));
-
-            updatedStack.Name = userInput;
-            updatedStack.ID = stackID;
-            try
+            if (userInput.ToLower() != "q")
             {
-                db.UpdateStack(updatedStack);
+                stackID = int.Parse(userInput);
+
+                userInput = AnsiConsole.Prompt(new TextPrompt<string>($"Enter new name for Stack ID '{stackID}': ")
+                    .PromptStyle("grey")
+                    .ValidationErrorMessage("Name must be less than 20 characters.")
+                    .Validate(input =>
+                    {
+                        if (input.Length > 20)
+                        {
+                            return false;
+                        }
+                        return true;
+                    }));
+
+                updatedStack.Name = userInput;
+                updatedStack.ID = stackID;
+                try
+                {
+                    db.UpdateStack(updatedStack);
+                }
+                catch { throw; }
             }
-            catch { throw; }
+            
 
         }
 
@@ -291,29 +291,36 @@ namespace Flashcards.Rxxyxd.Views
 
             var db = new Database.Database();
             var deleteStack = new Stacks();
-            int totalStackCount = db.GetStackCount();
+            int[] stackIds = db.GetStackIds();
 
-            var userInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter Stack ID: ")
+            var userInput = AnsiConsole.Prompt(new TextPrompt<string>("Enter Stack ID (or enter 'q' to return to menu): ")
                 .PromptStyle("grey")
                 .ValidationErrorMessage("Please enter an existing stack ID")
                 .Validate(input =>
                 {
-                    if (!int.TryParse(input, out int result))
+                    foreach (int id in stackIds)
+                    if (int.TryParse(input, out int result) && result == id)
                     {
-                        return false;
+                        return true;
                     }
-                    return result <= totalStackCount;
+                    if (input == "q")
+                    {
+                        return true;
+                    }
+                    return false;
                 }));
 
-            stackID = int.Parse(userInput);
-            deleteStack.ID = stackID;
-
-            try
+            if (userInput != "q")
             {
-                db.DeleteStack(deleteStack);
-            }
-            catch { throw; }
+                stackID = int.Parse(userInput);
+                deleteStack.ID = stackID;
 
+                try
+                {
+                    db.DeleteStack(deleteStack);
+                }
+                catch { throw; }
+            }
         }
 
         // Flashcard Management Methods
@@ -349,24 +356,34 @@ namespace Flashcards.Rxxyxd.Views
         {
             try
             {
+                AnsiConsole.Clear();
                 var db = new Database.Database();
                 string[] Stacks = db.GetStackArray();
                 var flashcard = new Models.Flashcards();
-                var title = new Rule("[green] Manage Flashcards [/]");
+                var title = new Rule("[green] Create Flashcard [/]");
                 AnsiConsole.Write(title);
 
+                if (Stacks.Length > 0)
+                {
+                    var option = AnsiConsole.Prompt(
+                        new SelectionPrompt<string>()
+                            .Title("Manage Stacks Menu")
+                            .PageSize(10)
+                            .AddChoices(Stacks));
 
-                var option = AnsiConsole.Prompt(
-                    new SelectionPrompt<string>()
-                        .Title("Manage Stacks Menu")
-                        .PageSize(10)
-                        .AddChoices(Stacks));
+                    flashcard.ID = db.GetStackIdByName(option);
 
-                flashcard.ID = db.GetStackIdByName(option);
-
-                // get question
-                // get answer
-                // db.CreateFlashcard(flashcard)
+                    flashcard.Question = AnsiConsole.Ask<string>("Enter Question: ");
+                    flashcard.Answer = AnsiConsole.Ask<string>("Enter Answer: ");
+                    db.CreateFlashcard(flashcard);
+                    AnsiConsole.Write("Flashcard created successfully. Press any key to continue.");
+                    Console.ReadKey();
+                }
+                else
+                {
+                    AnsiConsole.Write("There are no stacks to add flashcard to.\nCreate a stack and try again.\nPress any key to continue.");
+                    Console.ReadKey();
+                }
             }
             catch { throw; }
         }

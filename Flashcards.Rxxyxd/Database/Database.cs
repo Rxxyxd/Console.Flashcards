@@ -90,8 +90,9 @@ namespace Flashcards.Rxxyxd.Database
             }
         }
 
-        protected internal int GetStackCount()
+        protected internal int[] GetStackIds()
         {
+            List<int> ids = new List<int>();
             using (var conn = new SqlConnection(connectionString))
             {
                 using (var cmd = conn.CreateCommand())
@@ -99,9 +100,16 @@ namespace Flashcards.Rxxyxd.Database
                     try
                     {
                         conn.Open();
-                        string query = "SELECT COUNT(*) FROM Stacks;";
+                        string query = "SELECT ID FROM Stacks;";
                         cmd.CommandText = query;
-                        return (int)cmd.ExecuteScalar();
+                        using (var reader =  cmd.ExecuteReader())
+                        {
+                            while(reader.Read())
+                            {
+                                ids.Add(Convert.ToInt16(reader["ID"]));
+                            }
+                            return ids.ToArray();
+                        }
                     }
                     catch (SqlException) { throw; }
                     catch (Exception) { throw; }
@@ -271,7 +279,7 @@ namespace Flashcards.Rxxyxd.Database
                     var query = "SELECT ID FROM Stacks WHERE Name = @Name";
                     conn.Open();
                     cmd.CommandText = query;
-                    cmd.Parameters.AddWithValue(query, name);
+                    cmd.Parameters.AddWithValue("@name", name);
                     return Convert.ToInt16(cmd.ExecuteScalar());
                     
                 }
@@ -329,7 +337,44 @@ namespace Flashcards.Rxxyxd.Database
 
         protected internal void CreateFlashcard(Models.Flashcards flashcards)
         {
+            using (var conn = new SqlConnection(connectionString))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    try
+                    {
+                        if (flashcards.Question == null || flashcards.Answer == null)
+                        {
+                            throw new ArgumentException("Object flashcards contains Null values");
+                        }
+                        
+                        conn.Open();
 
+                        cmd.Connection = conn;
+                        
+                        var query = "INSERT INTO Flashcards VALUES (@ID, @Question, @Answer);";
+                        
+                        cmd.CommandText = query;
+                        cmd.Parameters.AddWithValue("@ID", flashcards.ID);
+                        cmd.Parameters.AddWithValue("@Question", flashcards.Question);
+                        cmd.Parameters.AddWithValue("@Answer", flashcards.Answer);
+                        
+                        cmd.ExecuteNonQuery();
+                        
+                        cmd.Dispose();
+                        conn.Close();
+                    }
+                    catch (SqlException) { throw; }
+                    catch (Exception) { throw; }
+                    finally
+                    {
+                        if (conn.State != System.Data.ConnectionState.Closed)
+                        {
+                            conn.Close();
+                        }
+                    }
+                }
+            }
         }
     }
 }
