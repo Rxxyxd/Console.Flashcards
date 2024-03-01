@@ -7,7 +7,7 @@ namespace Flashcards.Rxxyxd
     {
         static void Main(string[] args)
         {
-            var Controller = new DatabaseController();
+            var Controller = new DatabaseOperations();
             var Views = new View();
             try
             {

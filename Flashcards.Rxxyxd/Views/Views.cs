@@ -169,7 +169,7 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void ViewStacks()
         {
-            var Controller = new DatabaseController();
+            var Controller = new DatabaseOperations();
             var table = new Table();
             table.AddColumn("ID");
             table.AddColumn("Name");
@@ -192,7 +192,7 @@ namespace Flashcards.Rxxyxd.Views
         {
             bool exit = false;
             bool isValid;
-            var Controller = new DatabaseController();
+            var Controller = new DatabaseOperations();
             do
             {
                 Console.Clear();

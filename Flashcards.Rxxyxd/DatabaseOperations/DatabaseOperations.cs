@@ -4,7 +4,7 @@ using Flashcards.Rxxyxd.Models;
 
 namespace Flashcards.Rxxyxd.Controllers
 {
-    public class DatabaseController
+    public class DatabaseOperations
     {
         public string? connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
         public void InitializeDatabase()
