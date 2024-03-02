@@ -6,16 +6,16 @@ namespace Flashcards.Rxxyxd.Database
 {
     internal class Database
     {
-        public string? connectionString;
+        private string? _connectionString;
         public Database()
         {
-            connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
+            _connectionString = ConfigurationManager.AppSettings.Get("ConnectionString");
         }
         protected internal void Initialize()
         {
             string query;
 
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 try
                 {
@@ -49,7 +49,7 @@ namespace Flashcards.Rxxyxd.Database
         // CRUD for Stack table
         protected internal void CreateStack(Stacks newStack)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -65,7 +65,7 @@ namespace Flashcards.Rxxyxd.Database
                         cmd.Dispose();
                         conn.Close();
                     }
-                    catch(SqlException ex)
+                    catch (SqlException ex)
                     {
                         if (ex.Number == 2627)
                         {
@@ -76,7 +76,7 @@ namespace Flashcards.Rxxyxd.Database
                             throw;
                         }
                     }
-                    catch(Exception) { throw; }
+                    catch (Exception) { throw; }
 
                     finally
                     {
@@ -93,7 +93,7 @@ namespace Flashcards.Rxxyxd.Database
         protected internal int[] GetStackIds()
         {
             List<int> ids = new List<int>();
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -102,9 +102,9 @@ namespace Flashcards.Rxxyxd.Database
                         conn.Open();
                         string query = "SELECT ID FROM Stacks;";
                         cmd.CommandText = query;
-                        using (var reader =  cmd.ExecuteReader())
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            while(reader.Read())
+                            while (reader.Read())
                             {
                                 ids.Add(Convert.ToInt16(reader["ID"]));
                             }
@@ -130,7 +130,7 @@ namespace Flashcards.Rxxyxd.Database
         {
             List<Stacks> stacks = new List<Stacks>();
 
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -164,7 +164,7 @@ namespace Flashcards.Rxxyxd.Database
                     }
                     catch (SqlException) { throw; }
                     catch (Exception) { throw; }
-                    
+
                     finally
                     {
 
@@ -181,7 +181,7 @@ namespace Flashcards.Rxxyxd.Database
 
         protected internal void UpdateStack(Stacks updatedStack)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -214,7 +214,7 @@ namespace Flashcards.Rxxyxd.Database
 
         protected internal void DeleteStack(Stacks deleteStack)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -246,11 +246,11 @@ namespace Flashcards.Rxxyxd.Database
         protected internal string[] GetStackNameArray()
         {
             List<string> Stacks = new List<string>();
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
-                    
+
                     conn.Open();
                     var query = "SELECT * FROM Stacks;";
                     cmd.CommandText = query;
@@ -272,7 +272,7 @@ namespace Flashcards.Rxxyxd.Database
 
         protected internal int GetStackIdByName(string name)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -281,17 +281,17 @@ namespace Flashcards.Rxxyxd.Database
                     cmd.CommandText = query;
                     cmd.Parameters.AddWithValue("@name", name);
                     return Convert.ToInt16(cmd.ExecuteScalar());
-                    
+
                 }
             }
         }
 
         // CRUD Flashcards
-        
+
         protected internal List<Models.Flashcards> GetFlashcards()
         {
             List<Models.Flashcards> flashcards = new List<Models.Flashcards>();
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -326,7 +326,7 @@ namespace Flashcards.Rxxyxd.Database
                     finally
                     {
                         if (conn.State != System.Data.ConnectionState.Closed)
-                        { 
+                        {
                             conn.Close();
                         }
                     }
@@ -337,7 +337,7 @@ namespace Flashcards.Rxxyxd.Database
 
         protected internal void CreateFlashcard(Models.Flashcards flashcards)
         {
-            using (var conn = new SqlConnection(connectionString))
+            using (var conn = new SqlConnection(_connectionString))
             {
                 using (var cmd = conn.CreateCommand())
                 {
@@ -347,20 +347,20 @@ namespace Flashcards.Rxxyxd.Database
                         {
                             throw new ArgumentException("Object flashcards contains Null values");
                         }
-                        
+
                         conn.Open();
 
                         cmd.Connection = conn;
-                        
+
                         var query = "INSERT INTO Flashcards VALUES (@ID, @Question, @Answer);";
-                        
+
                         cmd.CommandText = query;
                         cmd.Parameters.AddWithValue("@ID", flashcards.ID);
                         cmd.Parameters.AddWithValue("@Question", flashcards.Question);
                         cmd.Parameters.AddWithValue("@Answer", flashcards.Answer);
-                        
+
                         cmd.ExecuteNonQuery();
-                        
+
                         cmd.Dispose();
                         conn.Close();
                     }
@@ -375,6 +375,32 @@ namespace Flashcards.Rxxyxd.Database
                     }
                 }
             }
+        }
+        protected internal string[] GetQuestionsById(int id)
+        {
+            List<string> questions = new List<string>();
+            using (var conn = new SqlConnection(_connectionString))
+            {
+                using (var cmd = conn.CreateCommand())
+                {
+                    conn.Open();
+                    string query = "SELECT * FROM Flashcards WHERE ID = @ID";
+                    cmd.CommandText = query;
+                    cmd.Parameters.AddWithValue("@ID", id);
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read());
+                        {
+                            questions.Add(reader.GetString(0));  
+                        }
+                        reader.Close();
+                    }
+                    cmd.Dispose();
+                    conn.Close();
+                    conn.Dispose();
+                }
+            }
+            return questions.ToArray();
         }
     }
 }

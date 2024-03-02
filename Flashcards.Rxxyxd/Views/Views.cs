@@ -178,7 +178,10 @@ namespace Flashcards.Rxxyxd.Views
                 var Stacks = Database.GetStacks();
                 foreach (var stack in Stacks)
                 {
-                    table.AddRow(stack.ID.ToString(), stack.Name.ToString());
+                    if (stack.Name != null)
+                    {
+                        table.AddRow(stack.ID.ToString(), stack.Name.ToString());
+                    }
                 }
             }
             catch { throw; }
@@ -358,18 +361,18 @@ namespace Flashcards.Rxxyxd.Views
             {
                 AnsiConsole.Clear();
                 var db = new Database.Database();
-                string[] Stacks = db.GetStackNameArray();
+                string[] stacks = db.GetStackNameArray();
                 var flashcard = new Models.Flashcards();
                 var title = new Rule("[green] Create Flashcard [/]");
                 AnsiConsole.Write(title);
 
-                if (Stacks.Length > 0)
+                if (stacks.Length > 0)
                 {
                     var option = AnsiConsole.Prompt(
                         new SelectionPrompt<string>()
                             .Title("Manage Stacks Menu")
                             .PageSize(10)
-                            .AddChoices(Stacks));
+                            .AddChoices(stacks));
 
                     flashcard.ID = db.GetStackIdByName(option);
 
@@ -390,7 +393,31 @@ namespace Flashcards.Rxxyxd.Views
 
         internal void UpdateFlashcards()
         {
+            AnsiConsole.Clear();
+            var db = new Database.Database();
+            string[] stacks = db.GetStackNameArray();
+            var flashcards = new Models.Flashcards();
+            if (stacks.Length > 0)
+            {
+                var option = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Select Stack to update flashcards from: ")
+                        .PageSize(10)
+                        .AddChoices(stacks));
 
+                int id = db.GetStackIdByName(option);
+                string[] questions = db.GetQuestionsById(id);
+
+                // confirmation prompt?
+
+                var updatedQuestion = AnsiConsole.Ask<string>("Updated Question: ");
+                var updatedAnswer = AnsiConsole.Ask<string>("Updated Answer: ");
+
+                flashcards.ID = id;
+                flashcards.Question = updatedQuestion;
+                flashcards.Answer = updatedAnswer;
+                // db.UpdateFlashcard(flashcards)
+            }
         }
 
         internal void DeleteFlashcards()
