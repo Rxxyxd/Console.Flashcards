@@ -243,7 +243,7 @@ namespace Flashcards.Rxxyxd.Database
             }
         }
 
-        protected internal string[] GetStackArray()
+        protected internal string[] GetStackNameArray()
         {
             List<string> Stacks = new List<string>();
             using (var conn = new SqlConnection(connectionString))

@@ -345,7 +345,7 @@ namespace Flashcards.Rxxyxd.Views
                 }
                 AnsiConsole.Write(table);
 
-                string[] Stacks = db.GetStackArray();
+                string[] Stacks = db.GetStackNameArray();
 
 
             }
@@ -358,7 +358,7 @@ namespace Flashcards.Rxxyxd.Views
             {
                 AnsiConsole.Clear();
                 var db = new Database.Database();
-                string[] Stacks = db.GetStackArray();
+                string[] Stacks = db.GetStackNameArray();
                 var flashcard = new Models.Flashcards();
                 var title = new Rule("[green] Create Flashcard [/]");
                 AnsiConsole.Write(title);
